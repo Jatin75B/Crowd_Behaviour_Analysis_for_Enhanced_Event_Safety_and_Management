@@ -1,4 +1,5 @@
 import cv2
+import time
 import numpy as np
 from Camera_video_mini import density
 from speed_calc_mini import speed_estimation1
@@ -27,7 +28,7 @@ def choose_input():
 resize_width = 640  # Change this according to your preference
 resize_height = 480  # Change this according to your preference
 
-frame_number = 0
+
 speeds=[]
 
 # Choose input source
@@ -47,6 +48,8 @@ else:  # Video file input
 cv2.namedWindow('Analyzed Frame', cv2.WINDOW_NORMAL)
 
 prev=0
+frame_no=0
+skip_var=10
 
 # Store the track history
 track_history = defaultdict(lambda: [])
@@ -57,49 +60,75 @@ direction_vectors = defaultdict(list)
 # Number of frames to consider for calculating the most common direction
 num_frames_to_consider = 1
 
+time10=0
+time1=0
+desired_fps = cap.get(cv2.CAP_PROP_FPS)
+skip_var=1
 # Process each frame from the camera or video
 while True:
-    ret, frame = cap.read()
+    frame_no+=1
+    success, frame = cap.read()
     big_frame=frame
-    if not ret:
+    if not success:
         print("End of video or failed to capture frame")
         break
-    
-    # Resize frame
-    frame = cv2.resize(frame, (resize_width, resize_height))
-    
-    overlay=density(frame)
-    # Overlay density map on frame
-    alpha = 0.5
-    
-    # Combine frame and overlay
-    combined = cv2.addWeighted(frame, 1, overlay, alpha, 0)
-    
-    combined_image1 = cv2.vconcat([frame, combined])
-    if frame_number==0:
-        prev=frame
-        heatmap_frame=frame
-        anotated_frame=frame
-        #_,track_history, direction_vectors=track(frame,track_history,direction_vectors,model)
+    if success and (frame_no%skip_var==0 or frame_no==1):
+        # Resize frame
+        frame = cv2.resize(frame, (resize_width, resize_height))
         
-    else:
-        heatmap_frame=speed_estimation1(speeds, prev, frame, frame_number)
-        prev=frame
-        #anotated_frame,track_history, direction_vectors=track(big_frame,track_history,direction_vectors,model)
-        #anotated_frame = cv2.resize(anotated_frame, (resize_width, resize_height))
+        overlay=density(frame)
+        # Overlay density map on frame
+        alpha = 0.5
+        
+        # Combine frame and overlay
+        combined = cv2.addWeighted(frame, 1, overlay, alpha, 0)
+        
+        combined_image1 = cv2.vconcat([frame, combined])
+        if frame_no==1:
+            prev=frame
+            heatmap_frame=frame
+            anotated_frame=frame
+            #_,track_history, direction_vectors=track(frame,track_history,direction_vectors,model)
+            
+        else:
+            heatmap_frame=speed_estimation1(speeds, prev, frame, frame_no)
+            prev=frame
+            # if (frame_no%skip_var==0 or frame_no==1):
+            #     anotated_frame,track_history, direction_vectors=track(big_frame,track_history,direction_vectors,model)
+            #     anotated_frame = cv2.resize(anotated_frame, (resize_width, resize_height))
+        
+        
+        
+        combined_image2 = cv2.vconcat([heatmap_frame, anotated_frame])
+        
+        combined_image = cv2.hconcat([combined_image1, combined_image2])
+        
     
-    
-    
-    combined_image2 = cv2.vconcat([heatmap_frame, anotated_frame])
-    
-    combined_image = cv2.hconcat([combined_image1, combined_image2])
-    
-    frame_number+=1
     
     # Display the analyzed frame
     cv2.imshow('Analyzed Frame', combined_image)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+    
+        time1=time.time()-time1
+    print(time1)
+    time10+=time1
+    if frame_no==11:
+        #print(time10)
+        # Calculate the average time taken to process 10 frames
+        avg_time_per_10_frames = time10 / 10
+
+        # Calculate the frames per second for the last 10 frames
+        frames_per_second = 1/desired_fps
+
+        # Calculate the number of frames to skip for real-time processing
+        skip_var = int(avg_time_per_10_frames/frames_per_second)
+        if skip_var<=0: 
+            skip_var=1
+        print(frames_per_second,' ',avg_time_per_10_frames)
+        print("Frames to skip for real-time processing:", skip_var)
+        print("-----------------------------------")
+    print(frame_no)
     
 # Release resources
 cap.release()
