@@ -51,4 +51,5 @@ def density(frame):
     num_people = len(contours)
     
     # Resize overlay to match frame dimensions
-    return cv2.putText(cv2.resize(overlay, (frame.shape[1], frame.shape[0])), f'People: {num_people}', (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2, cv2.LINE_AA)
+    #return cv2.putText(cv2.resize(overlay, (frame.shape[1], frame.shape[0])), f'People: {num_people}', (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2, cv2.LINE_AA)
+    return cv2.resize(overlay, (frame.shape[1], frame.shape[0])), num_people
