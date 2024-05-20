@@ -1,10 +1,10 @@
 import numpy as np
 
-RUNNING_THRESHOLD = 0.15
-FASTER_MOVEMENT_THRESHOLD= 0.22
+RUNNING_THRESHOLD = 4
+FASTER_MOVEMENT_THRESHOLD= 7
 
 
-def classify_movement(speed):
+def classify_movement1(speed):
     # Set a threshold to classify movement as 'Running' or 'Not Running'
     threshold = 5.0
     if speed > threshold:
@@ -19,7 +19,7 @@ def classify_movement(speed):
 
     if speed >= FASTER_MOVEMENT_THRESHOLD:
         return 'Faster Movement'
-    elif speed >= RUNNING_THRESHOLD:
+    elif speed >=RUNNING_THRESHOLD:
         return 'Running'
     else:
         return 'Not Running'

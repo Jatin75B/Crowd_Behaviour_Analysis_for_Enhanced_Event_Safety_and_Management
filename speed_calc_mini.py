@@ -19,7 +19,7 @@ def add_heatmap(frame, mag):
     
     return heatmap_overlay
 
-def speed_estimation1(speeds, frame1, frame2, frame_number):
+def speed_estimation1(speeds, frame1, frame2, avg):
         
     prvs = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
     next_frame = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
@@ -38,21 +38,23 @@ def speed_estimation1(speeds, frame1, frame2, frame_number):
         speeds.append(average_speed)
     else:
         speeds.append(np.nan)
-    
-    # Display the frame with visualizations
-    movement_label = classify_movement(avg_spd)
-    print(movement_label)
+    try:
+        # Display the frame with visualizations
+        movement_label = classify_movement(avg_spd)
+    except:
+        movement_label = 'nothing'
+    print(movement_label,' ',speeds)
     if movement_label == "Faster Movement":
         # cv2.putText(frame2, f'Frame: {frame_number,avg_spd,movement_label}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.25, (0, 0, 255), 1)
-        Result=f'Frame: {frame_number,avg_spd,movement_label}'
+        Result=f'Optical Flow Speed:{avg_spd} --> {movement_label}'
     elif movement_label == "Running":
         # cv2.putText(frame2, f'Frame: {frame_number,avg_spd,movement_label}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.25, (0, 255, 255), 1)
-        Result=f'Frame: {frame_number,avg_spd,movement_label}'
+        Result=f'Optical Flow Speed:{avg_spd} --> {movement_label}'
     else:
         # cv2.putText(frame2, f'Frame: {frame_number,avg_spd,movement_label}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.25, (0, 255, 0), 1)
-        Result=f'Frame: {frame_number,avg_spd,movement_label}'
+        Result=f'Optical Flow Speed:{avg_spd} --> {movement_label}'
 
     heatmap_frame = add_heatmap(frame2, mag)
-    return heatmap_frame,Result
+    return heatmap_frame,Result,speeds,avg_spd
         
 

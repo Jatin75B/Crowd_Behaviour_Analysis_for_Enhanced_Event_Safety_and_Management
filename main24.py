@@ -3,11 +3,8 @@ import time
 import numpy as np
 from Camera_video_mini import density
 from speed_calc_mini import speed_estimation1
-from collections import defaultdict, Counter
-from movement.move_track import track
-from ultralytics import YOLO
+from collections import defaultdict
 
-# model=YOLO('yolov8n.pt')
 
 # Function to choose camera or video input
 def choose_input():
@@ -92,7 +89,7 @@ while True:
             #_,track_history, direction_vectors=track(frame,track_history,direction_vectors,model)
             
         else:
-            heatmap_frame,optical_res=speed_estimation1(speeds, prev, frame, frame_no)
+            heatmap_frame,optical_res,speeds,=speed_estimation1(speeds, prev, frame, frame_no)
             prev=frame
             # if (frame_no%skip_var==0 or frame_no==1):
             #     anotated_frame,track_history, direction_vectors=track(big_frame,track_history,direction_vectors,model)
@@ -102,7 +99,7 @@ while True:
         black_frame = np.zeros((height, width, 3), dtype=np.uint8)  # creating a black frame
 
         # Step 2: Add text on the frame
-        text = f'People: {num_people}'+'\n'+ optical_res  # text to be added
+        text = f'People: {num_people}'+' '+ optical_res  # text to be added
         font = cv2.FONT_HERSHEY_SIMPLEX
         font_scale = 0.5  # initial font scale
         font_thickness = 1
