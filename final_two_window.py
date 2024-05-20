@@ -78,7 +78,7 @@ skip_var=1
 field_names = ["Time","NumOfPeople", "Optical Flow"]
 
 # Name of the CSV file
-csv_file = os.path.join("Data",datetime.now().strftime('%Y%m_%H%M%S')+'.csv')
+csv_file = os.path.join("Recorded_Data",datetime.now().strftime('%Y%m_%H%M%S')+'.csv')
 
 # Writing column names to CSV file
 with open(csv_file, mode='w', newline='') as file:
