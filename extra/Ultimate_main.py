@@ -1,6 +1,6 @@
 import time
 import threading
-from main24 import twoon
+from density_and_motion import twoon
 from movement.yomov_copy import oneon
 from ultralytics import YOLO
 
